@@ -55,11 +55,9 @@ CharacterStats.prototype.takeDamage = function (){
   * should inherit takeDamage() from CharacterStats
 */
 
- Humanoid.prototype = Object.create(GameObject.prototype);
  Humanoid.prototype = Object.create(CharacterStats.prototype);
 
  function Humanoid(hattr){
-   GameObject.call(this,hattr);
    CharacterStats.call(this,hattr);
    this.team = hattr.team;
    this.weapons = hattr.weapons;
@@ -146,3 +144,97 @@ CharacterStats.prototype.takeDamage = function (){
   // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
   // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
+  Humanoid.prototype.checkHealth = function(){
+    console.log(`${this.name}'s HP: ${this.healthPoints}`)
+    if (this.healthPoints <= 0){
+      console.log(this.destroy());
+    }
+  }
+
+
+Hero.prototype = Object.create(Humanoid.prototype);
+Villain.prototype = Object.create(Humanoid.prototype);
+
+  
+  function Hero (attrhero){
+    Humanoid.call(this,attrhero)
+    this.victory = function(){
+      console.log(`${this.name}: "Justice always wins" `)
+      }
+    }
+
+  Hero.prototype.punch = function(target){
+    console.log(`${this.name} landed a punch`)
+    return (target.healthPoints = target.healthPoints - 2); 
+  }
+
+  Hero.prototype.useWeapon = function(target){
+    console.log(`${this.name} uses ${this.weapons[0]}`)
+    return (target.healthPoints = target.healthPoints - 5); 
+  }
+  const Batman = new Hero({
+    createdAt: new Date(),
+    dimensions: {
+      length: 2,
+      width: 1,
+      height: 1,
+    },
+    healthPoints: 15,
+    name: 'Batman',
+    team: 'Justice League',
+    weapons: [
+      'batarang',
+      'gauntlets'
+    ],
+    language: 'English',
+  });
+
+  function Villain (attrvil){
+    Humanoid.call(this,attrvil)
+    this.victory = function(){
+      console.log(`${this.name}: "Crime Pays"`)
+      }
+  }
+
+
+  Villain.prototype.cut = function(target){
+    console.log(`${this.name} cut ${target.name}`)
+    return (target.healthPoints = target.healthPoints - 4);     
+  }
+
+  Villain.prototype.kick = function(target){
+    console.log(`${this.name} lands a kick`)
+    return (target.healthPoints = target.healthPoints - 2); 
+  }
+
+  const Joker = new Villain({
+    createdAt: new Date(),
+    dimensions: {
+      length: 2,
+      width: 1,
+      height: 1,
+    },
+    healthPoints: 12,
+    name: 'Joker',
+    team: 'Legion of Doom',
+    weapons: [
+      'Gun',
+      'Knife',
+      'Laughing Gas'
+    ],
+    language: 'English',
+  });
+
+  Batman.punch(Joker)
+  Joker.cut(Batman)
+  console.log(Batman.takeDamage())
+  console.log("Batman's remaining health = " + Batman.healthPoints)
+  console.log("Jokers remaining health = " + Joker.healthPoints)
+
+  Batman.useWeapon(Joker)
+  Joker.kick(Batman)
+  Batman.checkHealth()
+  Joker.checkHealth()
+  Batman.useWeapon(Joker)
+  Joker.checkHealth()
+  Batman.victory()

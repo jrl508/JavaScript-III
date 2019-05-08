@@ -23,8 +23,8 @@
 // code example for Implicit Binding
 
     const Obj = {
-        foo: 'bar',
-        objFun: function(name) {
+        foo: 'Bar',
+        objFun: function(call) {
         console.log(`${this.foo} ${call}!`);
         console.log(this);
         }
