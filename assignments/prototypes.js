@@ -16,12 +16,34 @@
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
 
+function GameObject (attr){
+  this.createdAt = attr.createdAt;
+  this.name = attr.name;
+  this.dimensions = attr.dimensions;
+
+}
+
+GameObject.prototype.destroy = function (){
+    return (`${this.name} was removed from the game`);
+  }
+
 /*
   === CharacterStats ===
   * healthPoints
   * takeDamage() // prototype method -> returns the string '<object name> took damage.'
   * should inherit destroy() from GameObject's prototype
 */
+CharacterStats.prototype = Object.create(GameObject.prototype)
+
+
+function CharacterStats (csattr){
+  GameObject.call(this, csattr);
+  this.healthPoints = csattr.healthPoints;
+}
+
+CharacterStats.prototype.takeDamage = function (){
+    return (`${this.name} took damage.`);
+  }
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -32,7 +54,22 @@
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
- 
+
+ Humanoid.prototype = Object.create(CharacterStats.prototype);
+
+ function Humanoid(hattr){
+   CharacterStats.call(this,hattr);
+   this.team = hattr.team;
+   this.weapons = hattr.weapons;
+   this.language = hattr.language;
+ }
+
+
+ Humanoid.prototype.greet = function (){
+   return(`${this.name} offers a greeting in ${this.language}.`)
+ }
+
+
 /*
   * Inheritance chain: GameObject -> CharacterStats -> Humanoid
   * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
@@ -41,7 +78,7 @@
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
-/*
+
   const mage = new Humanoid({
     createdAt: new Date(),
     dimensions: {
@@ -102,9 +139,102 @@
   console.log(archer.greet()); // Lilith offers a greeting in Elvish.
   console.log(mage.takeDamage()); // Bruce took damage.
   console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-*/
 
   // Stretch task: 
   // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
   // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
+  Humanoid.prototype.checkHealth = function(){
+    console.log(`${this.name}'s HP: ${this.healthPoints}`)
+    if (this.healthPoints <= 0){
+      console.log(this.destroy());
+    }
+  }
+
+
+Hero.prototype = Object.create(Humanoid.prototype);
+Villain.prototype = Object.create(Humanoid.prototype);
+
+  
+  function Hero (attrhero){
+    Humanoid.call(this,attrhero)
+    this.victory = function(){
+      console.log(`${this.name}: "Justice always wins" `)
+      }
+    }
+
+  Hero.prototype.punch = function(target){
+    console.log(`${this.name} landed a punch`)
+    return (target.healthPoints = target.healthPoints - 2); 
+  }
+
+  Hero.prototype.useWeapon = function(target){
+    console.log(`${this.name} uses ${this.weapons[0]}`)
+    return (target.healthPoints = target.healthPoints - 5); 
+  }
+  const Batman = new Hero({
+    createdAt: new Date(),
+    dimensions: {
+      length: 2,
+      width: 1,
+      height: 1,
+    },
+    healthPoints: 15,
+    name: 'Batman',
+    team: 'Justice League',
+    weapons: [
+      'batarang',
+      'gauntlets'
+    ],
+    language: 'English',
+  });
+
+  function Villain (attrvil){
+    Humanoid.call(this,attrvil)
+    this.victory = function(){
+      console.log(`${this.name}: "Crime Pays"`)
+      }
+  }
+
+
+  Villain.prototype.cut = function(target){
+    console.log(`${this.name} cut ${target.name}`)
+    return (target.healthPoints = target.healthPoints - 4);     
+  }
+
+  Villain.prototype.kick = function(target){
+    console.log(`${this.name} lands a kick`)
+    return (target.healthPoints = target.healthPoints - 2); 
+  }
+
+  const Joker = new Villain({
+    createdAt: new Date(),
+    dimensions: {
+      length: 2,
+      width: 1,
+      height: 1,
+    },
+    healthPoints: 12,
+    name: 'Joker',
+    team: 'Legion of Doom',
+    weapons: [
+      'Gun',
+      'Knife',
+      'Laughing Gas'
+    ],
+    language: 'English',
+  });
+
+  Batman.punch(Joker)
+  Joker.cut(Batman)
+  console.log(Batman.takeDamage())
+  console.log("Batman's remaining health = " + Batman.healthPoints)
+  console.log("Jokers remaining health = " + Joker.healthPoints)
+
+  Batman.useWeapon(Joker)
+  Joker.kick(Batman)
+  Batman.checkHealth()
+  Joker.checkHealth()
+  Batman.useWeapon(Joker)
+  Joker.checkHealth()
+  Batman.victory()
